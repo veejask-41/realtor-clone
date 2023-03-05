@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import OAuth from "../components/OAuth";
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState("")
+  const [email, setEmail] = useState("");
 
   function handleChange(e) {
     setEmail(e.target.value);
