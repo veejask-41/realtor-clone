@@ -1,6 +1,8 @@
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import OAuth from "../components/OAuth";
 
 export default function SignIn() {
@@ -10,12 +12,29 @@ export default function SignIn() {
     password: "",
   });
   const { email, password } = formData;
+  const navigate = useNavigate()
 
   function handleChange(e) {
     setFormData((prevData) => ({
       ...prevData,
       [e.target.id]: e.target.value,
     }));
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    try {
+      const auth = getAuth()
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      const user = userCredential.user
+
+      if(user){
+        navigate("/")
+      }
+
+    } catch (error) {
+      toast.error(error.code)
+    }
   }
 
   return (
@@ -30,7 +49,7 @@ export default function SignIn() {
           />
         </div>
         <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-          <form>
+          <form onSubmit={handleSubmit}>
             <input
               type="email"
               id="email"
