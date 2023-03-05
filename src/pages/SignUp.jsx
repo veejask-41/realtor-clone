@@ -1,15 +1,15 @@
-import React, { useState } from "react";
-import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
-import { Link, useNavigate } from "react-router-dom";
-import OAuth from "../components/OAuth";
 import {
   createUserWithEmailAndPassword,
   getAuth,
-  updateProfile,
+  updateProfile
 } from "firebase/auth";
-import { db } from "../firebase";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import React, { useState } from "react";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import OAuth from "../components/OAuth";
+import { db } from "../firebase";
 
 export default function SignUp() {
   const navigate = useNavigate();
