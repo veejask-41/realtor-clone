@@ -21,7 +21,7 @@ export default function Header() {
   }
 
   return (
-    <div className="bg-white border-b-2 shadow-sm sticky z-50">
+    <div className="bg-white border-b-2 shadow-sm sticky z-40">
       <header className="flex justify-between items-center px-3 max-w-6xl mx-auto">
         <div>
           <img
