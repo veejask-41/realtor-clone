@@ -1,16 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getAuth, updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
-import { doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { db } from "../firebase";
 import { FcHome } from "react-icons/fc";
 import { Link } from "react-router-dom";
+import ListingItem from "../components/ListingItem";
 
 export default function Profile() {
   const navigate = useNavigate();
   const auth = getAuth();
   const [changeDetail, setChangeDetail] = useState(false);
+  const [listings, setListings] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const [formData, setFormData] = useState({
     name: auth.currentUser.displayName,
     email: auth.currentUser.email,
@@ -48,6 +60,29 @@ export default function Profile() {
     auth.signOut();
     navigate("/");
   }
+
+  useEffect(() => {
+    async function fetchUserListings() {
+      const listingRef = collection(db, "listings");
+      const q = query(
+        listingRef,
+        where("userRef", "==", auth.currentUser.uid),
+        orderBy("timestamp", "desc")
+      );
+      const querySnap = await getDocs(q);
+      let listings = [];
+      querySnap.forEach((doc) => {
+        return listings.push({
+          id: doc.id,
+          data: doc.data(),
+        });
+      });
+      setListings(listings);
+      setLoading(false);
+    }
+    fetchUserListings();
+  }, [auth.currentUser.uid]);
+
   return (
     <>
       <section className="max-w-6xl mx-auto flex flex-col justify-center items-center">
@@ -95,14 +130,36 @@ export default function Profile() {
               </p>
             </div>
           </form>
-          <button type="submit" className="bg-blue-600 w-full text-white uppercase px-7 py-3 text-sm font-medium rounded shadow-md hover:bg-blue-700 active:bg-blue-800 hover:shadow-lg transition duration-150 ease-in-out">
-            <Link to="/create-listing" className="flex justify-center items-center">
+          <button
+            type="submit"
+            className="bg-blue-600 w-full text-white uppercase px-7 py-3 text-sm font-medium rounded shadow-md hover:bg-blue-700 active:bg-blue-800 hover:shadow-lg transition duration-150 ease-in-out"
+          >
+            <Link
+              to="/create-listing"
+              className="flex justify-center items-center"
+            >
               <FcHome className="mr-2 text-3xl bg-red-200 rounded-full p-1 border-2" />
               Sell or rent your home
             </Link>
           </button>
         </div>
       </section>
+      <div className="max-w-6xl px-3 mt-6 mx-auto">
+        {!loading && listings.length > 0 && (
+          <>
+            <h2 className="text-2xl text-center font-semibold">My Listings</h2>
+            <ul>
+              {listings.map((listing) => (
+                <ListingItem
+                  key={listing.id}
+                  id={listing.id}
+                  listing={listing.data}
+                />
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
     </>
   );
 }
