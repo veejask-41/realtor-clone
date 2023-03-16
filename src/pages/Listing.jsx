@@ -21,6 +21,7 @@ import {
 import { getAuth } from "firebase/auth";
 import Contact from "../components/Contact";
 import "swiper/css/bundle";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 
 export default function Listing() {
   const params = useParams();
@@ -150,7 +151,23 @@ export default function Listing() {
               <Contact userRef={listing.userRef} listing={listing} />
             )}
           </div>
-          <div className="w-full h-[200px] lg:h-[400px] z-10 overflow-x-hidden bg-blue-300"></div>
+          <div className="w-full h-[200px] md:h-[400px] z-10 overflow-x-hidden mt-6 md:mt-0 md:ml-2">
+            <MapContainer
+              center={[listing.geolocation.lat, listing.geolocation.lng]}
+              zoom={13}
+              scrollWheelZoom={false}
+              style={{ height: "100%", width: "100%" }}
+            >
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              <Marker
+                position={[listing.geolocation.lat, listing.geolocation.lng]}
+              >
+                <Popup>
+                  A pretty CSS3 popup. <br /> Easily customizable.
+                </Popup>
+              </Marker>
+            </MapContainer>
+          </div>
         </div>
       </main>
     );
